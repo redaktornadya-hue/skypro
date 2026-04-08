@@ -505,12 +505,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#111;font-family:var
   font-size: 52px; font-weight: 400;
   color: var(--ink); line-height: 1.3;
   margin-bottom: 40px;
-  max-width: 1400px;
+  max-width: 1500px;
 }
 .poll-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
   flex: 1;
 }
 .poll-opt {
@@ -520,20 +520,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:#111;font-family:var
   background: #F8F7FF;
   border: 3px solid var(--purple4);
   border-radius: 20px;
-  padding: 24px 40px;
+  padding: 32px 40px;
   cursor: pointer;
-  transition: all .25s;
+  transition: border-color .2s, background .2s;
   position: relative;
   overflow: hidden;
 }
-.poll-opt:hover { border-color: var(--purple3); background: var(--purple5); }
-.poll-opt.selected {
-  border-color: var(--purple);
-  background: var(--purple4);
+.poll-opt:hover:not(.correct):not(.wrong) {
+  border-color: var(--purple3);
+  background: var(--purple5);
 }
-.poll-opt.selected .poll-num {
-  background: var(--purple);
-  color: #fff;
+.poll-opt.correct {
+  background: var(--green-bg);
+  border-color: var(--green);
+}
+.poll-opt.wrong {
+  background: var(--red-bg);
+  border-color: var(--red);
 }
 .poll-num {
   width: 72px; height: 72px; min-width: 72px;
@@ -542,20 +545,38 @@ html,body{width:100%;height:100%;overflow:hidden;background:#111;font-family:var
   color: var(--purple);
   font-size: 40px; font-weight: 400;
   display: flex; align-items: center; justify-content: center;
-  transition: all .25s;
+  transition: background .2s, color .2s;
   flex-shrink: 0;
 }
+.poll-opt.correct .poll-num { background: var(--green); color: #fff; }
+.poll-opt.wrong   .poll-num { background: var(--red);   color: #fff; }
 .poll-text {
-  font-size: 44px; font-weight: 400;
+  font-size: 48px; font-weight: 400;
   color: var(--ink); line-height: 1.3;
   flex: 1;
 }
-.poll-bar { display: none; }
-.poll-hint {
-  font-size: 30px; color: var(--ink3);
-  margin-top: 16px; text-align: right;
+.poll-result {
+  font-size: 52px;
+  min-width: 60px;
+  text-align: center;
 }
-
+.poll-opt.correct .poll-result::after { content: '✓'; color: var(--green); }
+.poll-opt.wrong   .poll-result::after { content: '✗'; color: var(--red); }
+.poll-reset {
+  margin-top: 24px;
+  align-self: flex-start;
+  background: transparent;
+  border: 2px solid var(--ink3);
+  color: var(--ink2);
+  border-radius: 16px;
+  padding: 16px 40px;
+  font-size: 32px;
+  font-weight: 400;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: background .2s;
+}
+.poll-reset:hover { background: #f5f5f5; }
 
 /* ── FLIP CARDS ── */
 .cards-grid {
@@ -1265,41 +1286,40 @@ return result;
 </div>
 
 <!-- ══════════════════════════════════════
-     СЛАЙД 36 — ГОЛОСОВАНИЕ / ОПРОС
-     Участники пишут цифру в чат, ведущий кликает на вариант
+     СЛАЙД 36 — ГОЛОСОВАНИЕ
+     Кликни на вариант — подсветится верно/неверно
      ══════════════════════════════════════ -->
 <div class="slide lite" data-slide="36">
   <div class="interactive">
-    <div class="int-title anim d1">Голосование</div>
-    <div class="poll-question anim d2" id="poll-question">
-      Замени этот текст на свой вопрос для аудитории?
+    <div class="int-title anim d1">Голосование — <span>выбери правильный ответ</span></div>
+    <div class="poll-question anim d2">
+      Какой HTTP-метод используется для создания нового ресурса?
     </div>
-    <div class="poll-grid" id="poll-grid">
-      <div class="poll-opt anim-li" onclick="pollSelect(this)">
+    <div class="poll-grid">
+      <div class="poll-opt anim-li" onclick="pollAnswer(this, false)">
         <div class="poll-num">1</div>
-        <div class="poll-text">Вариант ответа первый</div>
-        <div class="poll-bar"><div class="poll-fill"></div></div>
+        <div class="poll-text">GET</div>
+        <div class="poll-result"></div>
       </div>
-      <div class="poll-opt anim-li" onclick="pollSelect(this)">
+      <div class="poll-opt anim-li" onclick="pollAnswer(this, true)">
         <div class="poll-num">2</div>
-        <div class="poll-text">Вариант ответа второй</div>
-        <div class="poll-bar"><div class="poll-fill"></div></div>
+        <div class="poll-text">POST</div>
+        <div class="poll-result"></div>
       </div>
-      <div class="poll-opt anim-li" onclick="pollSelect(this)">
+      <div class="poll-opt anim-li" onclick="pollAnswer(this, false)">
         <div class="poll-num">3</div>
-        <div class="poll-text">Вариант ответа третий</div>
-        <div class="poll-bar"><div class="poll-fill"></div></div>
+        <div class="poll-text">PUT</div>
+        <div class="poll-result"></div>
       </div>
-      <div class="poll-opt anim-li" onclick="pollSelect(this)">
+      <div class="poll-opt anim-li" onclick="pollAnswer(this, false)">
         <div class="poll-num">4</div>
-        <div class="poll-text">Вариант ответа четвёртый</div>
-        <div class="poll-bar"><div class="poll-fill"></div></div>
+        <div class="poll-text">DELETE</div>
+        <div class="poll-result"></div>
       </div>
     </div>
-    <div class="poll-hint">Нажми на вариант чтобы выделить правильный ответ</div>
+    <button class="poll-reset anim d5" onclick="pollReset()">↺ Сбросить</button>
   </div>
 </div>
-
 </div>
 
 <div id="nav">
@@ -1345,13 +1365,24 @@ function go(i) {
   document.getElementById('prog').style.width = ((cur+1)/total*100) + '%';
   const pi = document.getElementById('pi');
   if (cur + 1 < total) {
-    const next = slides[cur+1];
+    const next = slides[cur + 1];
     const cl = next.cloneNode(true);
-    // Preserve computed background
-    const bg = window.getComputedStyle(next).background;
-    cl.style.cssText = 'position:relative;display:block;opacity:1;pointer-events:none;width:1920px;height:1080px;';
-    cl.style.background = bg;
-    pi.innerHTML = ''; pi.appendChild(cl);
+    cl.style.cssText = 'position:relative;display:block;width:1920px;height:1080px;overflow:hidden;';
+    if (next.classList.contains('dark')) {
+      cl.style.background = 'radial-gradient(ellipse at 20% 50%,#8B50F0 0%,#6B2FD8 35%,#2A1580 70%,#0F0830 100%)';
+    } else {
+      cl.style.background = '#fff';
+    }
+    cl.querySelectorAll('*').forEach(el => {
+      el.style.animation = 'none';
+      el.style.transition = 'none';
+      if (el.classList.contains('anim') || el.classList.contains('anim-li') || el.classList.contains('reveal')) {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      }
+    });
+    pi.innerHTML = '';
+    pi.appendChild(cl);
   } else {
     pi.innerHTML = '<div style="height:1080px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.3);font-size:48px">—</div>';
   }
@@ -1632,10 +1663,31 @@ go = function(i) {
   };
 })();
 // ── ГОЛОСОВАНИЕ ─────────────────────────────────────────────
-function pollSelect(el) {
-  const all = el.closest('.poll-grid').querySelectorAll('.poll-opt');
-  all.forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
+function pollAnswer(el, isCorrect) {
+  // If already answered — ignore
+  if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+  // Disable all options
+  const opts = el.closest('.poll-grid').querySelectorAll('.poll-opt');
+  opts.forEach(o => o.style.pointerEvents = 'none');
+  // Mark clicked
+  el.classList.add(isCorrect ? 'correct' : 'wrong');
+  // If wrong — also reveal the correct one
+  if (!isCorrect) {
+    opts.forEach(o => {
+      if (!o.classList.contains('wrong') && !o.classList.contains('correct')) {
+        // find correct by checking onclick attribute
+        const fn = o.getAttribute('onclick') || '';
+        if (fn.includes('true')) o.classList.add('correct');
+      }
+    });
+  }
+}
+function pollReset() {
+  const opts = document.querySelectorAll('#pres .slide.active .poll-opt');
+  opts.forEach(o => {
+    o.classList.remove('correct', 'wrong');
+    o.style.pointerEvents = '';
+  });
 }
 
 
